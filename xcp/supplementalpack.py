@@ -74,7 +74,10 @@ class Package:
                 if m:
                     self.label = m.group(1)
                     self.kernel = m.group(3) + m.group(2)
-                    self.options = '-i'
+                    # this is a kernel module. Multiple packages of this module
+                    # can be installed for different kernel versions. But for
+                    # the same kernel version, only upgrade should be done.
+                    self.options = '-m'
                 else:
                     self.label = rpmname
                     self.kernel = 'any'

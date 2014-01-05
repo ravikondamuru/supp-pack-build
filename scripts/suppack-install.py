@@ -135,14 +135,22 @@ for p in filter(lambda x: isinstance(x, RPMPackage), repo.packages):
     pkg_ver, _ = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',
                                     '-p', p.filename], stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE).communicate()
-    if 'options' in p.__dict__:
-        install = '-i' in p.options
-    else:
-        install = (pkg_name in ['kernel-xen', 'kernel-kdump'])
     s = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',
                           pkg_name], stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     inst_ver, _ = s.communicate()
+
+    if 'options' in p.__dict__:
+        install = False
+        if '-i' in p.options:
+            install = True
+        elif '-m' in p.options:
+            # kernel module, if it exists upgrade, else install
+            if s.returncode != 0:
+                install = True
+    else:
+        install = (pkg_name in ['kernel-xen', 'kernel-kdump'])
+
     if s.returncode != 0:
         if install:
             install_list.append(p)
