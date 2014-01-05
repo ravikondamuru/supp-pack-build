@@ -137,6 +137,8 @@ for p in filter(lambda x: isinstance(x, RPMPackage), repo.packages):
                                    stderr=subprocess.PIPE).communicate()
     if 'options' in p.__dict__:
         install = '-i' in p.options
+    elif 'kernel' in p.__dict__: # Package with dependent kernel version in name. eg: driver-rpm
+        install = pkg_name != p.filename
     else:
         install = (pkg_name in ['kernel-xen', 'kernel-kdump'])
     s = subprocess.Popen(['rpm', '--nosignature', '-q', '--qf', '%{VERSION}-%{RELEASE}',

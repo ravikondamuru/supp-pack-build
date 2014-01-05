@@ -73,8 +73,11 @@ class Package:
                 m = re.search('(.*)-modules-([^-]*)-(.*)', rpmname)
                 if m:
                     self.label = m.group(1)
+                    # include kernel version, as this package is version dependent
                     self.kernel = m.group(3) + m.group(2)
-                    self.options = '-i'
+                    # Check in install script if name is same, do upgrade even
+                    # thought this is kernel version dependent package, since 
+                    # name has kernel version in it.
                 else:
                     self.label = rpmname
                     self.kernel = 'any'
